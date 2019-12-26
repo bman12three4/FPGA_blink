@@ -22,4 +22,4 @@ begin
 	end
 end
 
-endmodule //simple
+endmodule //counter
