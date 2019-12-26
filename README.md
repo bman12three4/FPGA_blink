@@ -7,3 +7,5 @@ Blink just blinks the first LED.
 Counter uses all 10 LEDs and counts up to 1023
 
 Toggle makes all the LEDs blink but only if the corresponding switch is on.
+
+vga puts some colors on the screen.
