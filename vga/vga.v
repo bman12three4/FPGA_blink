@@ -7,6 +7,16 @@ module vga (
 	output reg vsync
 	);
 	
+	wire vga_clk;
+	wire vga_locked;
+	
+	vga_clk vga_clk_a(
+	.areset (0),
+	.inclk0 (clk),
+	.c0 (vga_clk),
+	.locked (vga_locked)
+	);
+	
 	reg [14:0] counter;
 	reg [10:0] vgatimer;
 	reg [9:0] line;
@@ -17,89 +27,73 @@ module vga (
 	reg [3:0] tmpgrnvga;
 	reg [3:0] tmpbluvga;
 	
-	always @ (posedge clk)
-	begin
-		if (line == 0 && vgatimer == 0)
-		begin
+	always @ (posedge vga_clk) begin
+		if (line == 0 && vgatimer == 0) begin
 			counter <= counter + 1;
 		end
-		if (counter >= 5)
-		begin
+		if (counter >= 5) begin
 			counter <= 0;
-			if (grad < 15)
-			begin
+			if (grad < 15) begin
 				grad = grad + 1;
 				tmpredvga <= tmpredvga + color[0];
 				tmpgrnvga <= tmpgrnvga + color[1];
 				tmpbluvga <= tmpbluvga + color[2];
 			end
-			else
-			begin
+			else begin
 				grad <= 0;
 				tmpredvga <= 0;
 				tmpgrnvga <= 0;
 				tmpbluvga <= 0;
-				if (color < 7)
-				begin
+				if (color < 7) begin
 					color <= color + 1;
 				end
-				else
-				begin
+				else begin
 					color <= 0;
 				end
 			end
 		end
 		
-		if (vgatimer <= 190)
-		begin
+		if (vgatimer <= 96) begin
 			hsync <= 0;
 			redvga <= 0;
 			grnvga <= 0;
 			bluvga <= 0;
 			vgatimer <= vgatimer + 1;
 		end
-		else if (vgatimer <= 285)
-		begin
+		else if (vgatimer <= 144) begin
 			hsync <= 1;
 			redvga <= 0;
 			grnvga <= 0;
 			bluvga <= 0;
 			vgatimer <= vgatimer + 1;
 		end
-		else if (vgatimer <= 1555)
-		begin
+		else if (vgatimer <= 784) begin
 			hsync <= 1;
 			redvga <= tmpredvga;
 			grnvga <= tmpgrnvga;
 			bluvga <= tmpbluvga;
 			vgatimer <= vgatimer + 1;
 		end
-		else if (vgatimer <= 1585)
-		begin
+		else if (vgatimer <= 800) begin
 			hsync <= 1;
 			redvga <= 0;
 
 			vgatimer <= vgatimer + 1;
 		end
-		else 
-		begin
+		else begin
 			vgatimer <= 0;
-			if (line < 525)
-			begin
+			if (line < 525) begin
 				line <= line + 1;
 			end
-			else 
-			begin
+			else begin
 				line <= 0;
 			end
 		end
 		
-		if (line <=2)
-		begin
+		if (line <=2) begin
 			vsync <= 0;
 		end
-		else if (line <= 35)
-		begin
+		else if (line <= 35) begin
 			vsync <= 1;
 		end
 	end
